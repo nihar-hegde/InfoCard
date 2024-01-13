@@ -16,8 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { buttonVariants } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
+import { PencilLine, Trash2 } from "lucide-react";
+import { DeleteButton } from "./DeleteButton";
 
 interface Props {
   data: ICardData[];
@@ -72,6 +74,12 @@ export const CardInfoTable = ({ data }: Props) => {
             </TableCell>
             <TableCell>
               {item.twitterUrl ? item.twitterUrl : "Not Available"}
+            </TableCell>
+            <TableCell className="flex items-center justify-center gap-1">
+              <Link href={"/dashoard"} className={buttonVariants()}>
+                <PencilLine className="h-4 w-4" />
+              </Link>
+              <DeleteButton id={item.id} />
             </TableCell>
           </TableRow>
         ))}

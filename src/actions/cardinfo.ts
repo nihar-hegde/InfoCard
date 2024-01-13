@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { InputFormSchema } from "@/lib/validators";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
 export const createCard = async (values: z.infer<typeof InputFormSchema>) => {
@@ -47,6 +47,25 @@ export const getSinglecard = async (id: string) => {
       },
     });
     return userData;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+interface DeleteProps {
+  id: string;
+  path: string;
+}
+
+export const deleteCard = async (props: DeleteProps) => {
+  try {
+    await db.cardinfo.delete({
+      where: {
+        id: props.id,
+      },
+    });
+    revalidatePath(props.path);
+    return { success: "Deleted succesfully!" };
   } catch (error) {
     console.log(error);
   }
