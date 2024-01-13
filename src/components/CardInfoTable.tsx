@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { buttonVariants } from "./ui/button";
+import Link from "next/link";
 
 interface Props {
   data: ICardData[];
@@ -41,7 +42,14 @@ export const CardInfoTable = ({ data }: Props) => {
         {data.map((item, index) => (
           <TableRow key={item.id}>
             <TableCell className="font-medium">{index + 1}</TableCell>
-            <TableCell>{item.name}</TableCell>
+            <TableCell>
+              <Link
+                href={`dashboard/${item.id}`}
+                className={buttonVariants({ variant: "outline" })}
+              >
+                {item.name}
+              </Link>
+            </TableCell>
             <TableCell className="truncate">{item.description}</TableCell>
             <TableCell>
               <DropdownMenu>
