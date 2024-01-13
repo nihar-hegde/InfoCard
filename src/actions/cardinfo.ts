@@ -70,3 +70,37 @@ export const deleteCard = async (props: DeleteProps) => {
     console.log(error);
   }
 };
+
+interface CardDataTypes {
+  id: string;
+  name: string;
+  description: string;
+  interests: string[];
+  githubUrl?: string;
+  twitterUrl?: string;
+}
+interface UpdateCardProps {
+  data: CardDataTypes;
+}
+export const updateCard = async ({ data }: UpdateCardProps) => {
+  try {
+    const { id, name, description, interests, githubUrl, twitterUrl } = data;
+
+    const updateData = await db.cardinfo.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name,
+        description,
+        interests,
+        githubUrl,
+        twitterUrl,
+      },
+    });
+    revalidatePath("/dashboard");
+    return updateData;
+  } catch (error) {
+    console.log(error);
+  }
+};

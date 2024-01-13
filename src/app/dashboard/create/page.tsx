@@ -9,7 +9,7 @@ const CreatePage = () => {
           <CardTitle>Create Info Card</CardTitle>
         </CardHeader>
         <CardContent className="w-full">
-          <InputForm />
+          <InputForm type="Create" />
         </CardContent>
       </Card>
     </div>

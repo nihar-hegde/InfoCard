@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,34 +18,69 @@ import { InputFormSchema } from "@/lib/validators";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
 import { X } from "lucide-react";
-import { createCard } from "@/actions/cardinfo";
+import { createCard, updateCard } from "@/actions/cardinfo";
 import { useRouter } from "next/navigation";
+import { ICardData } from "@/types";
 
-export function InputForm() {
+type InputFormProps = {
+  type: "Create" | "Update";
+  CardData?: ICardData;
+};
+
+export function InputForm({ type, CardData }: InputFormProps) {
   const router = useRouter();
+  const initialValues =
+    CardData && type === "Update"
+      ? {
+          ...CardData,
+          githubUrl: CardData.githubUrl ?? undefined,
+          twitterUrl: CardData.twitterUrl ?? undefined,
+        }
+      : {
+          name: "",
+          description: "",
+          interests: [],
+          githubUrl: "" || undefined,
+          twitterUrl: "" || undefined,
+        };
   const form = useForm<z.infer<typeof InputFormSchema>>({
     resolver: zodResolver(InputFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      interests: [],
-      githubUrl: "" || undefined,
-      twitterUrl: "" || undefined,
-    },
+    defaultValues: initialValues,
   });
 
   async function onSubmit(data: z.infer<typeof InputFormSchema>) {
-    try {
-      await createCard(data);
-      form.reset();
-      router.push("/dashboard");
-    } catch (error) {
-      console.log(error);
+    if (type === "Create") {
+      try {
+        const newCard = await createCard(data);
+        if (newCard) {
+          form.reset();
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (type === "Update") {
+      if (!CardData?.id) {
+        router.back();
+        return;
+      }
+      try {
+        const udpateCardDone = await updateCard({
+          data: { ...data, id: CardData.id },
+        });
+        if (udpateCardDone) {
+          form.reset();
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
   const handleInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    field: any,
+    field: any
   ) => {
     if (e.key === "Enter" && field.name === "interests") {
       e.preventDefault();
