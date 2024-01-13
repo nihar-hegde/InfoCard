@@ -38,3 +38,16 @@ export const getCard = async () => {
     console.log(error);
   }
 };
+
+export const getSinglecard = async (id: string) => {
+  try {
+    const userData = await db.cardinfo.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return userData;
+  } catch (error) {
+    console.log(error);
+  }
+};
