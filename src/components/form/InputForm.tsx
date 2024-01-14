@@ -24,10 +24,11 @@ import { ICardData } from "@/types";
 
 type InputFormProps = {
   type: "Create" | "Update";
+  userId: string;
   CardData?: ICardData;
 };
 
-export function InputForm({ type, CardData }: InputFormProps) {
+export function InputForm({ type, CardData, userId }: InputFormProps) {
   const router = useRouter();
   const initialValues =
     CardData && type === "Update"
@@ -49,9 +50,10 @@ export function InputForm({ type, CardData }: InputFormProps) {
   });
 
   async function onSubmit(data: z.infer<typeof InputFormSchema>) {
+    const cardData = { ...data, userId: userId };
     if (type === "Create") {
       try {
-        const newCard = await createCard(data);
+        const newCard = await createCard(cardData);
         if (newCard) {
           form.reset();
           router.push("/dashboard");
@@ -67,7 +69,7 @@ export function InputForm({ type, CardData }: InputFormProps) {
       }
       try {
         const udpateCardDone = await updateCard({
-          data: { ...data, id: CardData.id },
+          data: { ...data, id: CardData.id, userId: userId },
         });
         if (udpateCardDone) {
           form.reset();

@@ -5,7 +5,16 @@ import { InputFormSchema } from "@/lib/validators";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
-export const createCard = async (values: z.infer<typeof InputFormSchema>) => {
+interface CreateCardProps {
+  userId: string;
+  name: string;
+  description: string;
+  interests: string[];
+  githubUrl?: string;
+  twitterUrl?: string;
+}
+
+export const createCard = async (values: CreateCardProps) => {
   try {
     const validatedValues = InputFormSchema.safeParse(values);
 
@@ -16,6 +25,7 @@ export const createCard = async (values: z.infer<typeof InputFormSchema>) => {
       validatedValues.data;
     await db.cardinfo.create({
       data: {
+        userId: values.userId,
         name: name,
         description: description,
         interests: interests,
@@ -30,19 +40,29 @@ export const createCard = async (values: z.infer<typeof InputFormSchema>) => {
   }
 };
 
-export const getCard = async () => {
+export const getCard = async (id: string) => {
   try {
-    const data = await db.cardinfo.findMany({});
+    const data = await db.cardinfo.findMany({
+      where: {
+        userId: id,
+      },
+    });
     return data;
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getSinglecard = async (id: string) => {
+interface getSingleCardProps {
+  id: string;
+  userId: string;
+}
+
+export const getSinglecard = async ({ id, userId }: getSingleCardProps) => {
   try {
     const userData = await db.cardinfo.findUnique({
       where: {
+        userId: userId,
         id: id,
       },
     });
@@ -54,6 +74,7 @@ export const getSinglecard = async (id: string) => {
 
 interface DeleteProps {
   id: string;
+  userId: string;
   path: string;
 }
 
@@ -61,6 +82,7 @@ export const deleteCard = async (props: DeleteProps) => {
   try {
     await db.cardinfo.delete({
       where: {
+        userId: props.userId,
         id: props.id,
       },
     });
@@ -73,6 +95,7 @@ export const deleteCard = async (props: DeleteProps) => {
 
 interface CardDataTypes {
   id: string;
+  userId: string;
   name: string;
   description: string;
   interests: string[];
@@ -84,10 +107,12 @@ interface UpdateCardProps {
 }
 export const updateCard = async ({ data }: UpdateCardProps) => {
   try {
-    const { id, name, description, interests, githubUrl, twitterUrl } = data;
+    const { id, userId, name, description, interests, githubUrl, twitterUrl } =
+      data;
 
     const updateData = await db.cardinfo.update({
       where: {
+        userId: userId,
         id: id,
       },
       data: {

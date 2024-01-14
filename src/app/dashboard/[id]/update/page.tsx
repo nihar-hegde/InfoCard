@@ -2,12 +2,19 @@ import { getSinglecard } from "@/actions/cardinfo";
 import { InputForm } from "@/components/form/InputForm";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { auth } from "@/auth";
 interface IParams {
   id: string;
 }
 
 const UpdatePage = async ({ params }: { params: IParams }) => {
-  const cardInfo = await getSinglecard(params.id);
+  const id = params.id;
+  const user = await auth();
+  if (!user?.user) {
+    return;
+  }
+  const userId = user?.user.id;
+  const cardInfo = await getSinglecard({ id, userId });
   return (
     <div className="flex items-center justify-center p-20">
       {cardInfo ? (
@@ -16,7 +23,7 @@ const UpdatePage = async ({ params }: { params: IParams }) => {
             <CardTitle>Update Info Card</CardTitle>
           </CardHeader>
           <CardContent className="w-full">
-            <InputForm type="Update" CardData={cardInfo} />
+            <InputForm type="Update" CardData={cardInfo} userId={userId} />
           </CardContent>
         </Card>
       ) : (

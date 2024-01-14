@@ -1,12 +1,5 @@
 import { ICardData } from "@/types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
   Table,
@@ -18,22 +11,61 @@ import {
 } from "@/components/ui/table";
 import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
-import { PencilLine, Plus } from "lucide-react";
+import { LogOut, PencilLine, Plus } from "lucide-react";
 import { DeleteButton } from "./DeleteButton";
+import { auth } from "@/auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogoutButton } from "./auth/logout-button";
 
 interface Props {
   data: ICardData[];
 }
 
-export const CardInfoTable = ({ data }: Props) => {
+export const CardInfoTable = async ({ data }: Props) => {
+  const userSession = await auth();
+  if (!userSession) {
+    return;
+  }
+
+  const imageUrl = userSession?.user?.image;
   return (
     <>
-      <Link
-        href={"/dashboard/create"}
-        className={`${buttonVariants()} flex gap-1`}
-      >
-        Create <Plus />
-      </Link>
+      <div className="flex items-center justify-between p-3">
+        <Link
+          href={"/dashboard/create"}
+          className={`${buttonVariants()} flex gap-1`}
+        >
+          Create <Plus />
+        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Avatar>
+              <AvatarImage
+                src={imageUrl ? imageUrl : "https://github.com/shadcn.png"}
+              />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem>
+              <LogoutButton>
+                Logout <LogOut />
+              </LogoutButton>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -88,7 +120,11 @@ export const CardInfoTable = ({ data }: Props) => {
                 >
                   <PencilLine className="h-4 w-4" />
                 </Link>
-                <DeleteButton id={item.id} />
+                {userSession.user ? (
+                  <DeleteButton id={item.id} userId={userSession?.user?.id} />
+                ) : (
+                  <p>Not logged in</p>
+                )}
               </TableCell>
             </TableRow>
           ))}

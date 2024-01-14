@@ -1,4 +1,5 @@
 import { getSinglecard } from "@/actions/cardinfo";
+import { auth } from "@/auth";
 import { CardInfo } from "@/components/CardInfo";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
@@ -9,7 +10,13 @@ interface IParams {
 }
 
 const InfoPage = async ({ params }: { params: IParams }) => {
-  const cardInfo = await getSinglecard(params.id);
+  const id = params.id;
+  const user = await auth();
+  if (!user?.user) {
+    return;
+  }
+  const userId = user?.user.id;
+  const cardInfo = await getSinglecard({ id, userId });
 
   return (
     <div className="felx flex-col items-center justify-center p-20">

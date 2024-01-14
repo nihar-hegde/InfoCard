@@ -7,15 +7,16 @@ import { usePathname } from "next/navigation";
 
 interface DeleteButtonProps {
   id: string;
+  userId: string;
 }
 export const DeleteButton = (props: DeleteButtonProps) => {
-  const { id } = props;
+  const { id, userId } = props;
   const [deleteing, setDeleting] = useState(false);
   const path = usePathname();
   const handleOnClick = async () => {
     try {
       setDeleting(true);
-      await deleteCard({ id, path });
+      await deleteCard({ id, userId, path });
       setDeleting(false);
     } catch (error) {
       console.log(error);
