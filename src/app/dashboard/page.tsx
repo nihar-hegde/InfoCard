@@ -1,8 +1,6 @@
 import { getCard } from "@/actions/cardinfo";
 import { CardInfoTable } from "@/components/CardInfoTable";
-import { buttonVariants } from "@/components/ui/button";
 
-import Link from "next/link";
 import React from "react";
 
 const DashboardPage = async () => {

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
-import { PencilLine, Plus, Trash2 } from "lucide-react";
+import { PencilLine, Plus } from "lucide-react";
 import { DeleteButton } from "./DeleteButton";
 
 interface Props {
